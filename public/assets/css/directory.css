@@ -1,0 +1,54 @@
+#directory {
+  height: 100%;
+  width: 250px;
+  background-color: #e82323;
+}
+
+.room-list {
+  width: 100%;
+  height: 80%;
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+}
+
+.room {
+  width: 100%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.room:hover {
+  background-color: #b72525;
+  cursor: pointer;
+}
+
+.room-name {
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.user-container {
+  height: 15%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#user-name {
+  font-family: 'Lato', sans-serif;
+  color: white;
+  font-size: 20px;
+  margin-left: 10px;
+}
+
+#user-duration {
+  font-family: 'Lato', sans-serif;
+  color: white;
+  margin-left: 10px;
+}
