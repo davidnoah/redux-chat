@@ -19,7 +19,7 @@ class Messages extends React.Component {
   _handleEnter(event) {
     let props = this.props;
     if (event.key == 'Enter') {
-      this.props.addMessage(props.room.id, event.target.value, props.user)
+      this.props.addMessage(props.room.id, event.target.value, props.user);
       event.target.value = "";
       this.props.fetchRoom(props.room.id);
     }

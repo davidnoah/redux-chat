@@ -4,13 +4,12 @@ import { fetchRooms, fetchRoom } from '../../actions/room_actions';
 import { fetchMessages } from '../../actions/message_actions';
 
 const mapStateToProps = state => ({
-  rooms: state.rooms.roomsList,
+  rooms: state.rooms,
   user: state.user
 });
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchRooms: () => dispatch(fetchRooms()),
     fetchRoom: (id) => dispatch(fetchRoom(id)),
     fetchMessages: (id) => dispatch(fetchMessages(id))
   };

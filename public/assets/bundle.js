@@ -21535,17 +21535,13 @@
 	
 	var _store2 = _interopRequireDefault(_store);
 	
-	var _directory_container = __webpack_require__(289);
-	
-	var _directory_container2 = _interopRequireDefault(_directory_container);
-	
-	var _login_container = __webpack_require__(293);
+	var _login_container = __webpack_require__(294);
 	
 	var _login_container2 = _interopRequireDefault(_login_container);
 	
-	var _chat_container = __webpack_require__(295);
+	var _chat = __webpack_require__(297);
 	
-	var _chat_container2 = _interopRequireDefault(_chat_container);
+	var _chat2 = _interopRequireDefault(_chat);
 	
 	var _room_actions = __webpack_require__(273);
 	
@@ -21554,6 +21550,9 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	// Actions
+	
+	
+	// Components
 	var Root = function Root(_ref) {
 	  var store = _ref.store;
 	
@@ -21562,7 +21561,7 @@
 	    if (!store.getState().user) {
 	      replace('/');
 	    } else {
-	      store.dispatch((0, _room_actions.fetchRooms)()).then(store.dispatch((0, _room_actions.fetchRoom)(0))).then(store.dispatch((0, _message_actions.fetchMessages)(0))).then(function () {
+	      store.dispatch((0, _room_actions.fetchRoom)(0)).then(store.dispatch((0, _room_actions.fetchRooms)())).then(store.dispatch((0, _message_actions.fetchMessages)(0))).then(function () {
 	        return cb();
 	      });
 	    }
@@ -21575,12 +21574,11 @@
 	      _reactRouter.Router,
 	      { history: _reactRouter.browserHistory },
 	      _react2.default.createElement(_reactRouter.Route, { path: '/', component: _login_container2.default }),
-	      _react2.default.createElement(_reactRouter.Route, { path: '/chat', component: _chat_container2.default, onEnter: ensureLogin })
+	      _react2.default.createElement(_reactRouter.Route, { path: '/chat', component: _chat2.default, onEnter: ensureLogin })
 	    )
 	  );
 	};
 	
-	// Components
 	exports.default = Root;
 
 /***/ },
@@ -28773,7 +28771,7 @@
 	
 	var _root_reducer2 = _interopRequireDefault(_root_reducer);
 	
-	var _enhancers = __webpack_require__(282);
+	var _enhancers = __webpack_require__(283);
 	
 	var _enhancers2 = _interopRequireDefault(_enhancers);
 	
@@ -28810,11 +28808,16 @@
 	
 	var _message_reducer2 = _interopRequireDefault(_message_reducer);
 	
+	var _current_room_reducer = __webpack_require__(282);
+	
+	var _current_room_reducer2 = _interopRequireDefault(_current_room_reducer);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = (0, _redux.combineReducers)({
 	  user: _user_reducer2.default,
 	  rooms: _room_reducer2.default,
+	  currentRoom: _current_room_reducer2.default,
 	  messages: _message_reducer2.default
 	});
 
@@ -28832,28 +28835,16 @@
 	
 	var _lodash = __webpack_require__(276);
 	
-	var _defaultState = {
-	  roomsList: [],
-	  currentRoom: {}
-	};
-	
 	var RoomReducer = function RoomReducer() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _defaultState;
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 	  var action = arguments[1];
 	
 	  Object.freeze(state);
 	
+	  console.log(action.type);
 	  switch (action.type) {
 	    case _room_actions.RECEIVE_ROOMS:
-	      return (0, _lodash.merge)({}, state, {
-	        roomsList: action.rooms
-	      });
-	    case _room_actions.RECEIVE_ROOM:
-	      var newState = (0, _lodash.merge)({}, state, {
-	        currentRoom: action.room
-	      });
-	      newState.currentRoom.users = action.room.users;
-	      return newState;
+	      return action.rooms;
 	    default:
 	      return state;
 	  }
@@ -56438,13 +56429,45 @@
 	  value: true
 	});
 	
+	var _room_actions = __webpack_require__(273);
+	
+	var _lodash = __webpack_require__(276);
+	
+	var CurrentRoomReducer = function CurrentRoomReducer() {
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	  var action = arguments[1];
+	
+	  Object.freeze(state);
+	
+	  switch (action.type) {
+	    case _room_actions.RECEIVE_ROOM:
+	      var newState = (0, _lodash.merge)({}, state, action.room);
+	      newState.users = action.room.users;
+	      return newState;
+	    default:
+	      return state;
+	  }
+	};
+	
+	exports.default = CurrentRoomReducer;
+
+/***/ },
+/* 283 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
 	var _redux = __webpack_require__(243);
 	
-	var _reduxLocalstorage = __webpack_require__(283);
+	var _reduxLocalstorage = __webpack_require__(284);
 	
 	var _reduxLocalstorage2 = _interopRequireDefault(_reduxLocalstorage);
 	
-	var _reduxThunk = __webpack_require__(288);
+	var _reduxThunk = __webpack_require__(289);
 	
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 	
@@ -56455,7 +56478,7 @@
 	exports.default = enhancers;
 
 /***/ },
-/* 283 */
+/* 284 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56470,11 +56493,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _createSlicerJs = __webpack_require__(284);
+	var _createSlicerJs = __webpack_require__(285);
 	
 	var _createSlicerJs2 = _interopRequireDefault(_createSlicerJs);
 	
-	var _utilMergeStateJs = __webpack_require__(287);
+	var _utilMergeStateJs = __webpack_require__(288);
 	
 	var _utilMergeStateJs2 = _interopRequireDefault(_utilMergeStateJs);
 	
@@ -56549,7 +56572,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 284 */
+/* 285 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56561,11 +56584,11 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _getSubsetJs = __webpack_require__(285);
+	var _getSubsetJs = __webpack_require__(286);
 	
 	var _getSubsetJs2 = _interopRequireDefault(_getSubsetJs);
 	
-	var _utilTypeOfJs = __webpack_require__(286);
+	var _utilTypeOfJs = __webpack_require__(287);
 	
 	var _utilTypeOfJs2 = _interopRequireDefault(_utilTypeOfJs);
 	
@@ -56600,7 +56623,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 285 */
+/* 286 */
 /***/ function(module, exports) {
 
 	/**
@@ -56634,7 +56657,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 286 */
+/* 287 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -56672,7 +56695,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 287 */
+/* 288 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -56692,7 +56715,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 288 */
+/* 289 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -56720,7 +56743,7 @@
 	exports['default'] = thunk;
 
 /***/ },
-/* 289 */
+/* 290 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56731,7 +56754,7 @@
 	
 	var _reactRedux = __webpack_require__(234);
 	
-	var _directory = __webpack_require__(290);
+	var _directory = __webpack_require__(291);
 	
 	var _directory2 = _interopRequireDefault(_directory);
 	
@@ -56743,16 +56766,13 @@
 	
 	var mapStateToProps = function mapStateToProps(state) {
 	  return {
-	    rooms: state.rooms.roomsList,
+	    rooms: state.rooms,
 	    user: state.user
 	  };
 	};
 	
 	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	  return {
-	    fetchRooms: function fetchRooms() {
-	      return dispatch((0, _room_actions.fetchRooms)());
-	    },
 	    fetchRoom: function fetchRoom(id) {
 	      return dispatch((0, _room_actions.fetchRoom)(id));
 	    },
@@ -56765,7 +56785,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_directory2.default);
 
 /***/ },
-/* 290 */
+/* 291 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56780,11 +56800,11 @@
 	
 	var _lodash = __webpack_require__(276);
 	
-	var _room = __webpack_require__(291);
+	var _room = __webpack_require__(292);
 	
 	var _room2 = _interopRequireDefault(_room);
 	
-	var _user_item = __webpack_require__(292);
+	var _user_item = __webpack_require__(293);
 	
 	var _user_item2 = _interopRequireDefault(_user_item);
 	
@@ -56826,7 +56846,7 @@
 	exports.default = Directory;
 
 /***/ },
-/* 291 */
+/* 292 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56859,7 +56879,7 @@
 	exports.default = Room;
 
 /***/ },
-/* 292 */
+/* 293 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56951,7 +56971,7 @@
 	exports.default = UserItem;
 
 /***/ },
-/* 293 */
+/* 294 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56962,7 +56982,7 @@
 	
 	var _reactRedux = __webpack_require__(234);
 	
-	var _login = __webpack_require__(294);
+	var _login = __webpack_require__(295);
 	
 	var _login2 = _interopRequireDefault(_login);
 	
@@ -56987,7 +57007,7 @@
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_login2.default);
 
 /***/ },
-/* 294 */
+/* 295 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -57060,7 +57080,7 @@
 	module.exports = (0, _reactRouter.withRouter)(Login);
 
 /***/ },
-/* 295 */
+/* 296 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -57071,9 +57091,9 @@
 	
 	var _reactRedux = __webpack_require__(234);
 	
-	var _chat = __webpack_require__(296);
+	var _messages = __webpack_require__(298);
 	
-	var _chat2 = _interopRequireDefault(_chat);
+	var _messages2 = _interopRequireDefault(_messages);
 	
 	var _message_actions = __webpack_require__(280);
 	
@@ -57083,7 +57103,7 @@
 	
 	var mapStateToProps = function mapStateToProps(state) {
 	  return {
-	    currentRoom: state.rooms.currentRoom,
+	    room: state.currentRoom,
 	    messages: state.messages,
 	    user: state.user
 	  };
@@ -57103,10 +57123,10 @@
 	  };
 	};
 	
-	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_chat2.default);
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_messages2.default);
 
 /***/ },
-/* 296 */
+/* 297 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -57119,40 +57139,29 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _directory_container = __webpack_require__(289);
+	var _directory_container = __webpack_require__(290);
 	
 	var _directory_container2 = _interopRequireDefault(_directory_container);
 	
-	var _messages = __webpack_require__(297);
+	var _chat_container = __webpack_require__(296);
 	
-	var _messages2 = _interopRequireDefault(_messages);
+	var _chat_container2 = _interopRequireDefault(_chat_container);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Chat = function Chat(_ref) {
-	  var currentRoom = _ref.currentRoom,
-	      messages = _ref.messages,
-	      addMessage = _ref.addMessage,
-	      user = _ref.user,
-	      fetchRoom = _ref.fetchRoom;
-	
+	var Chat = function Chat() {
 	  return _react2.default.createElement(
 	    'div',
 	    { className: 'chat-container' },
 	    _react2.default.createElement(_directory_container2.default, null),
-	    _react2.default.createElement(_messages2.default, { user: user,
-	      room: currentRoom,
-	      messages: messages,
-	      addMessage: addMessage,
-	      fetchRoom: fetchRoom
-	    })
+	    _react2.default.createElement(_chat_container2.default, null)
 	  );
 	};
 	
 	exports.default = Chat;
 
 /***/ },
-/* 297 */
+/* 298 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -57163,11 +57172,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _log = __webpack_require__(298);
+	var _log = __webpack_require__(299);
 	
 	var _log2 = _interopRequireDefault(_log);
 	
-	var _room_info = __webpack_require__(299);
+	var _room_info = __webpack_require__(300);
 	
 	var _room_info2 = _interopRequireDefault(_room_info);
 	
@@ -57240,7 +57249,7 @@
 	module.exports = Messages;
 
 /***/ },
-/* 298 */
+/* 299 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -57322,7 +57331,7 @@
 	exports.default = Log;
 
 /***/ },
-/* 299 */
+/* 300 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -57340,6 +57349,7 @@
 	var RoomInfo = function RoomInfo(_ref) {
 	  var room = _ref.room;
 	
+	  debugger;
 	  return _react2.default.createElement(
 	    'div',
 	    { className: 'room-info-container' },

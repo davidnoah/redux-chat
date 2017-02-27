@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
-import Chat from './chat';
+import Messages from './messages';
 import { fetchMessages, addMessage } from '../../actions/message_actions';
 import { fetchRoom } from '../../actions/room_actions';
 
 const mapStateToProps = state => ({
-  currentRoom: state.rooms.currentRoom,
+  room: state.currentRoom,
   messages: state.messages,
   user: state.user,
 });
@@ -20,4 +20,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Chat);
+)(Messages);
