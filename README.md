@@ -97,4 +97,4 @@ Because I saved the current user's info in the browser's localStorage API, the u
 
 [] I would like to implement to redirect to the '/chat' route if a user navigates to the index route and is logged in. But first, I will need to implement a logout function that would destroy the user item within localStorage and redirect a user to the login page to ensure the user won't get stuck logged in.
 
-[]
+[] In the apps current setup, all chatroom specific messages are acquired upon entrance. This is a costly maneuver and does not scale well. Large scale chat applications like Slack, can quickly can very quickly reach message counts well over 100,000 and we don't want to have to create an html element for every single message at this scale -- O(n). One solution would be to implement an infinite scroll within the message log. A finite number of messages would be fetched from our database upon initial load. Then, a scroll waypoint location would be identified. Once the scroll rolls past this waypoint location, an action would be dispatched to acquire more messages.
