@@ -4,8 +4,7 @@ import { merge } from 'lodash';
 
 const RoomReducer = (state = [], action) => {
   Object.freeze(state);
-  
-  console.log(action.type);
+
   switch(action.type) {
     case RECEIVE_ROOMS:
       return action.rooms;

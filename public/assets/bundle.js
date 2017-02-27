@@ -28841,7 +28841,6 @@
 	
 	  Object.freeze(state);
 	
-	  console.log(action.type);
 	  switch (action.type) {
 	    case _room_actions.RECEIVE_ROOMS:
 	      return action.rooms;
@@ -57349,7 +57348,6 @@
 	var RoomInfo = function RoomInfo(_ref) {
 	  var room = _ref.room;
 	
-	  debugger;
 	  return _react2.default.createElement(
 	    'div',
 	    { className: 'room-info-container' },
