@@ -8,10 +8,16 @@ class Login extends React.Component {
     this.state = {
       user: ""
     };
-    bindAll(this, '_handleChange', '_handleSubmit');
+    bindAll(this, '_handleChange', '_login', '_handleKeyPress');
   }
 
-  _handleSubmit() {
+  _handleKeyPress(event) {
+    if (event.key === "Enter") {
+      this._login();
+    }
+  }
+
+  _login() {
     this.props.loginUser(capitalize(this.state.user));
     this.props.router.push('/chat');
   }
@@ -25,8 +31,8 @@ class Login extends React.Component {
   render() {
     return (
       <div className='login-page'>
-        <input className='login-textbox' type='text' id='user' onChange={this._handleChange} placeholder='Type in your username...'/>
-        <button className='login-button' onClick={this._handleSubmit}>Launch</button>
+        <input className='login-textbox' maxLength={20} type='text' id='user' onKeyPress={this._handleKeyPress} onChange={this._handleChange} placeholder='Type in your username...'/>
+        <button className='login-button' onClick={this._login}>Launch Chat</button>
       </div>
     );
   }

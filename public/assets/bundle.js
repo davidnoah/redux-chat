@@ -57040,13 +57040,20 @@
 	    _this.state = {
 	      user: ""
 	    };
-	    (0, _lodash.bindAll)(_this, '_handleChange', '_handleSubmit');
+	    (0, _lodash.bindAll)(_this, '_handleChange', '_login', '_handleKeyPress');
 	    return _this;
 	  }
 	
 	  _createClass(Login, [{
-	    key: '_handleSubmit',
-	    value: function _handleSubmit() {
+	    key: '_handleKeyPress',
+	    value: function _handleKeyPress(event) {
+	      if (event.key === "Enter") {
+	        this._login();
+	      }
+	    }
+	  }, {
+	    key: '_login',
+	    value: function _login() {
 	      this.props.loginUser((0, _lodash.capitalize)(this.state.user));
 	      this.props.router.push('/chat');
 	    }
@@ -57063,11 +57070,11 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'login-page' },
-	        _react2.default.createElement('input', { className: 'login-textbox', type: 'text', id: 'user', onChange: this._handleChange, placeholder: 'Type in your username...' }),
+	        _react2.default.createElement('input', { className: 'login-textbox', maxLength: 20, type: 'text', id: 'user', onKeyPress: this._handleKeyPress, onChange: this._handleChange, placeholder: 'Type in your username...' }),
 	        _react2.default.createElement(
 	          'button',
-	          { className: 'login-button', onClick: this._handleSubmit },
-	          'Launch'
+	          { className: 'login-button', onClick: this._login },
+	          'Launch Chat'
 	        )
 	      );
 	    }
