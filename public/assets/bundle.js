@@ -58,11 +58,25 @@
 	
 	var _root2 = _interopRequireDefault(_root);
 	
+	var _store = __webpack_require__(270);
+	
+	var _store2 = _interopRequireDefault(_store);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	document.addEventListener("DOMContentLoaded", function () {
 	  var rootDiv = document.getElementById("root");
-	  _reactDom2.default.render(_react2.default.createElement(_root2.default, null), rootDiv);
+	
+	  var store = void 0;
+	  var user = window.localStorage.getItem('_chatAppCurrentUser');
+	  if (user) {
+	    var preloadedState = { user: user };
+	    store = (0, _store2.default)(preloadedState);
+	  } else {
+	    store = (0, _store2.default)();
+	  }
+	  window.store = store;
+	  _reactDom2.default.render(_react2.default.createElement(_root2.default, { store: store }), rootDiv);
 	});
 
 /***/ },
@@ -21521,20 +21535,47 @@
 	
 	var _store2 = _interopRequireDefault(_store);
 	
-	var _directory_container = __webpack_require__(278);
+	var _directory_container = __webpack_require__(289);
 	
 	var _directory_container2 = _interopRequireDefault(_directory_container);
 	
+	var _login_container = __webpack_require__(293);
+	
+	var _login_container2 = _interopRequireDefault(_login_container);
+	
+	var _chat_container = __webpack_require__(295);
+	
+	var _chat_container2 = _interopRequireDefault(_chat_container);
+	
+	var _room_actions = __webpack_require__(273);
+	
+	var _message_actions = __webpack_require__(280);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Root = function Root() {
+	// Actions
+	var Root = function Root(_ref) {
+	  var store = _ref.store;
+	
+	
+	  var ensureLogin = function ensureLogin(nextState, replace, cb) {
+	    if (!store.getState().user) {
+	      replace('/');
+	    } else {
+	      store.dispatch((0, _room_actions.fetchRooms)()).then(store.dispatch((0, _room_actions.fetchRoom)(0))).then(store.dispatch((0, _message_actions.fetchMessages)(0))).then(function () {
+	        return cb();
+	      });
+	    }
+	  };
+	
 	  return _react2.default.createElement(
 	    _reactRedux.Provider,
-	    { store: _store2.default },
+	    { store: store },
 	    _react2.default.createElement(
 	      _reactRouter.Router,
 	      { history: _reactRouter.browserHistory },
-	      _react2.default.createElement(_reactRouter.Route, { path: '/chat', component: _directory_container2.default })
+	      _react2.default.createElement(_reactRouter.Route, { path: '/', component: _login_container2.default }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/chat', component: _chat_container2.default, onEnter: ensureLogin })
 	    )
 	  );
 	};
@@ -28732,15 +28773,18 @@
 	
 	var _root_reducer2 = _interopRequireDefault(_root_reducer);
 	
-	var _reduxThunk = __webpack_require__(277);
+	var _enhancers = __webpack_require__(282);
 	
-	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
+	var _enhancers2 = _interopRequireDefault(_enhancers);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var store = (0, _redux.createStore)(_root_reducer2.default, (0, _redux.applyMiddleware)(_reduxThunk2.default));
+	var configureStore = function configureStore() {
+	  var preloadedState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	  return (0, _redux.createStore)(_root_reducer2.default, preloadedState, _enhancers2.default);
+	};
 	
-	exports.default = store;
+	exports.default = configureStore;
 
 /***/ },
 /* 271 */
@@ -28758,10 +28802,20 @@
 	
 	var _room_reducer2 = _interopRequireDefault(_room_reducer);
 	
+	var _user_reducer = __webpack_require__(277);
+	
+	var _user_reducer2 = _interopRequireDefault(_user_reducer);
+	
+	var _message_reducer = __webpack_require__(279);
+	
+	var _message_reducer2 = _interopRequireDefault(_message_reducer);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = (0, _redux.combineReducers)({
-	  rooms: _room_reducer2.default
+	  user: _user_reducer2.default,
+	  rooms: _room_reducer2.default,
+	  messages: _message_reducer2.default
 	});
 
 /***/ },
@@ -28778,16 +28832,28 @@
 	
 	var _lodash = __webpack_require__(276);
 	
+	var _defaultState = {
+	  roomsList: [],
+	  currentRoom: {}
+	};
+	
 	var RoomReducer = function RoomReducer() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _defaultState;
 	  var action = arguments[1];
 	
 	  Object.freeze(state);
-	  var newSatte = (0, _lodash.merge)({}, state);
 	
 	  switch (action.type) {
 	    case _room_actions.RECEIVE_ROOMS:
-	      return action.rooms;
+	      return (0, _lodash.merge)({}, state, {
+	        roomsList: action.rooms
+	      });
+	    case _room_actions.RECEIVE_ROOM:
+	      var newState = (0, _lodash.merge)({}, state, {
+	        currentRoom: action.room
+	      });
+	      newState.currentRoom.users = action.room.users;
+	      return newState;
 	    default:
 	      return state;
 	  }
@@ -28804,7 +28870,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.receiveRooms = exports.fetchRooms = exports.RECEIVE_ROOMS = exports.FETCH_ROOMS = undefined;
+	exports.receiveRoom = exports.receiveRooms = exports.fetchRoom = exports.fetchRooms = exports.RECEIVE_ROOM = exports.RECEIVE_ROOMS = exports.FETCH_ROOMS = undefined;
 	
 	var _room_api_util = __webpack_require__(274);
 	
@@ -28814,7 +28880,9 @@
 	
 	var FETCH_ROOMS = exports.FETCH_ROOMS = "FETCH_ROOMS";
 	var RECEIVE_ROOMS = exports.RECEIVE_ROOMS = "RECEIVE_ROOMS";
+	var RECEIVE_ROOM = exports.RECEIVE_ROOM = "RECEIVE_ROOM";
 	
+	// async actions
 	var fetchRooms = exports.fetchRooms = function fetchRooms() {
 	  return function (dispatch) {
 	    return APIUtil.fetchRooms().then(function (rooms) {
@@ -28823,10 +28891,26 @@
 	  };
 	};
 	
+	var fetchRoom = exports.fetchRoom = function fetchRoom(id) {
+	  return function (dispatch) {
+	    return APIUtil.fetchRoom(id).then(function (room) {
+	      return dispatch(receiveRoom(room));
+	    });
+	  };
+	};
+	
+	// sync actions
 	var receiveRooms = exports.receiveRooms = function receiveRooms(rooms) {
 	  return {
 	    type: RECEIVE_ROOMS,
 	    rooms: rooms
+	  };
+	};
+	
+	var receiveRoom = exports.receiveRoom = function receiveRoom(room) {
+	  return {
+	    type: RECEIVE_ROOM,
+	    room: room
 	  };
 	};
 
@@ -28839,13 +28923,22 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.fetchRooms = undefined;
+	exports.fetchRoom = exports.fetchRooms = undefined;
 	
 	var _jquery = __webpack_require__(275);
 	
 	var fetchRooms = exports.fetchRooms = function fetchRooms() {
 	  return (0, _jquery.ajax)({
 	    url: 'http://localhost:8080/api/rooms',
+	    error: function error(err) {
+	      return console.log(err);
+	    }
+	  });
+	};
+	
+	var fetchRoom = exports.fetchRoom = function fetchRoom(id) {
+	  return (0, _jquery.ajax)({
+	    url: 'http://localhost:8080/api/rooms/' + id,
 	    error: function error(err) {
 	      return console.log(err);
 	    }
@@ -56171,6 +56264,435 @@
 
 /***/ },
 /* 277 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _user_actions = __webpack_require__(278);
+	
+	var UserReducer = function UserReducer() {
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+	  var action = arguments[1];
+	
+	  Object.freeze(state);
+	
+	  switch (action.type) {
+	    case _user_actions.RECEIVE_CURRENT_USER:
+	      return action.user;
+	    default:
+	      return state;
+	  }
+	};
+	
+	exports.default = UserReducer;
+
+/***/ },
+/* 278 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var LOGIN_USER = exports.LOGIN_USER = 'LOGIN_USER';
+	var RECEIVE_CURRENT_USER = exports.RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
+	
+	var receiveCurrentUser = exports.receiveCurrentUser = function receiveCurrentUser(user) {
+	  return {
+	    type: RECEIVE_CURRENT_USER,
+	    user: user
+	  };
+	};
+
+/***/ },
+/* 279 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _message_actions = __webpack_require__(280);
+	
+	var _lodash = __webpack_require__(276);
+	
+	var MessageReducer = function MessageReducer() {
+	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	  var action = arguments[1];
+	
+	  Object.freeze(state);
+	
+	  switch (action.type) {
+	    case _message_actions.RECEIVE_MESSAGES:
+	      return action.messages;
+	    case _message_actions.RECEIVE_MESSAGE:
+	      var newState = state.slice(0);
+	      newState.push(action.message);
+	      return newState;
+	    default:
+	      return state;
+	  }
+	};
+	
+	exports.default = MessageReducer;
+
+/***/ },
+/* 280 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.receiveMessage = exports.receiveMessages = exports.addMessage = exports.fetchMessages = exports.RECEIVE_MESSAGE = exports.RECEIVE_MESSAGES = undefined;
+	
+	var _message_api_util = __webpack_require__(281);
+	
+	var APIUtil = _interopRequireWildcard(_message_api_util);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
+	var RECEIVE_MESSAGES = exports.RECEIVE_MESSAGES = "RECEIVE_MESSAGES";
+	var RECEIVE_MESSAGE = exports.RECEIVE_MESSAGE = "RECEIVE_MESSAGE";
+	
+	// async actions
+	var fetchMessages = exports.fetchMessages = function fetchMessages(id) {
+	  return function (dispatch) {
+	    return APIUtil.fetchMessages(id).then(function (messages) {
+	      return dispatch(receiveMessages(messages));
+	    });
+	  };
+	};
+	
+	var addMessage = exports.addMessage = function addMessage(id, message, name) {
+	  return function (dispatch) {
+	    return APIUtil.addMessage(id, message, name).then(function (message) {
+	      return dispatch(receiveMessage(message));
+	    });
+	  };
+	};
+	
+	// sync actions
+	var receiveMessages = exports.receiveMessages = function receiveMessages(messages) {
+	  return {
+	    type: RECEIVE_MESSAGES,
+	    messages: messages
+	  };
+	};
+	
+	var receiveMessage = exports.receiveMessage = function receiveMessage(message) {
+	  return {
+	    type: RECEIVE_MESSAGE,
+	    message: message
+	  };
+	};
+
+/***/ },
+/* 281 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.addMessage = exports.fetchMessages = undefined;
+	
+	var _jquery = __webpack_require__(275);
+	
+	var fetchMessages = exports.fetchMessages = function fetchMessages(id) {
+	  return (0, _jquery.ajax)({
+	    url: 'http://localhost:8080/api/rooms/' + id + '/messages',
+	    error: function error(err) {
+	      return console.log(err);
+	    }
+	  });
+	};
+	
+	var addMessage = exports.addMessage = function addMessage(id, message, name) {
+	  return (0, _jquery.ajax)({
+	    url: 'http://localhost:8080/api/rooms/' + id + '/messages',
+	    method: 'POST',
+	    data: {
+	      name: name,
+	      message: message
+	    }
+	  });
+	};
+
+/***/ },
+/* 282 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _redux = __webpack_require__(243);
+	
+	var _reduxLocalstorage = __webpack_require__(283);
+	
+	var _reduxLocalstorage2 = _interopRequireDefault(_reduxLocalstorage);
+	
+	var _reduxThunk = __webpack_require__(288);
+	
+	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var enhancers = (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), (0, _reduxLocalstorage2.default)('user', { key: '_chatAppCurrentUser' }));
+	
+	exports.default = enhancers;
+
+/***/ },
+/* 283 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	exports['default'] = persistState;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _createSlicerJs = __webpack_require__(284);
+	
+	var _createSlicerJs2 = _interopRequireDefault(_createSlicerJs);
+	
+	var _utilMergeStateJs = __webpack_require__(287);
+	
+	var _utilMergeStateJs2 = _interopRequireDefault(_utilMergeStateJs);
+	
+	/**
+	 * @description
+	 * persistState is a Store Enhancer that syncs (a subset of) store state to localStorage.
+	 *
+	 * @param {String|String[]} [paths] Specify keys to sync with localStorage, if left undefined the whole store is persisted
+	 * @param {Object} [config] Optional config object
+	 * @param {String} [config.key="redux"] String used as localStorage key
+	 * @param {Function} [config.slicer] (paths) => (state) => subset. A function that returns a subset
+	 * of store state that should be persisted to localStorage
+	 * @param {Function} [config.serialize=JSON.stringify] (subset) => serializedData. Called just before persisting to
+	 * localStorage. Should transform the subset into a format that can be stored.
+	 * @param {Function} [config.deserialize=JSON.parse] (persistedData) => subset. Called directly after retrieving
+	 * persistedState from localStorage. Should transform the data into the format expected by your application
+	 *
+	 * @return {Function} An enhanced store
+	 */
+	
+	function persistState(paths, config) {
+	  var cfg = _extends({
+	    key: 'redux',
+	    merge: _utilMergeStateJs2['default'],
+	    slicer: _createSlicerJs2['default'],
+	    serialize: JSON.stringify,
+	    deserialize: JSON.parse
+	  }, config);
+	
+	  var key = cfg.key;
+	  var merge = cfg.merge;
+	  var slicer = cfg.slicer;
+	  var serialize = cfg.serialize;
+	  var deserialize = cfg.deserialize;
+	
+	  return function (next) {
+	    return function (reducer, initialState, enhancer) {
+	      if (typeof initialState === 'function' && typeof enhancer === 'undefined') {
+	        enhancer = initialState;
+	        initialState = undefined;
+	      }
+	
+	      var persistedState = undefined;
+	      var finalInitialState = undefined;
+	
+	      try {
+	        persistedState = deserialize(localStorage.getItem(key));
+	        finalInitialState = merge(initialState, persistedState);
+	      } catch (e) {
+	        console.warn('Failed to retrieve initialize state from localStorage:', e);
+	      }
+	
+	      var store = next(reducer, finalInitialState, enhancer);
+	      var slicerFn = slicer(paths);
+	
+	      store.subscribe(function () {
+	        var state = store.getState();
+	        var subset = slicerFn(state);
+	
+	        try {
+	          localStorage.setItem(key, serialize(subset));
+	        } catch (e) {
+	          console.warn('Unable to persist state to localStorage:', e);
+	        }
+	      });
+	
+	      return store;
+	    };
+	  };
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 284 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = createSlicer;
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _getSubsetJs = __webpack_require__(285);
+	
+	var _getSubsetJs2 = _interopRequireDefault(_getSubsetJs);
+	
+	var _utilTypeOfJs = __webpack_require__(286);
+	
+	var _utilTypeOfJs2 = _interopRequireDefault(_utilTypeOfJs);
+	
+	/**
+	 * @description
+	 * createSlicer inspects the typeof paths and returns an appropriate slicer function.
+	 *
+	 * @param {String|String[]} [paths] The paths argument supplied to persistState.
+	 *
+	 * @return {Function} A slicer function, which returns the subset to store when called with Redux's store state.
+	 */
+	
+	function createSlicer(paths) {
+	  switch ((0, _utilTypeOfJs2['default'])(paths)) {
+	    case 'void':
+	      return function (state) {
+	        return state;
+	      };
+	    case 'string':
+	      return function (state) {
+	        return (0, _getSubsetJs2['default'])(state, [paths]);
+	      };
+	    case 'array':
+	      return function (state) {
+	        return (0, _getSubsetJs2['default'])(state, paths);
+	      };
+	    default:
+	      return console.error('Invalid paths argument, should be of type String, Array or Void');
+	  }
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 285 */
+/***/ function(module, exports) {
+
+	/**
+	 * @description
+	 * getSubset returns an object with the same structure as the original object passed in,
+	 * but contains only the specified keys and only if that key has a truth-y value.
+	 *
+	 * @param {Object} obj The object from which to create a subset.
+	 * @param {String[]} paths An array of (top-level) keys that should be included in the subset.
+	 *
+	 * @return {Object} An object that contains the specified keys with truth-y values
+	 */
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = getSubset;
+	
+	function getSubset(obj, paths) {
+	  var subset = {};
+	
+	  paths.forEach(function (key) {
+	    var slice = obj[key];
+	    if (slice) subset[key] = slice;
+	  });
+	
+	  return subset;
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 286 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = typeOf;
+	var _isArray = Array.isArray || (Array.isArray = function (a) {
+	  return '' + a !== a && ({}).toString.call(a) === '[object Array]';
+	});
+	
+	/**
+	 * @description
+	 * typeof method that
+	 * 1. groups all false-y & empty values as void
+	 * 2. distinguishes between object and array
+	 *
+	 * @param {*} thing The thing to inspect
+	 *
+	 * @return {String} Actionable type classification
+	 */
+	
+	function typeOf(thing) {
+	  if (!thing) return 'void';
+	
+	  if (_isArray(thing)) {
+	    if (!thing.length) return 'void';
+	    return 'array';
+	  }
+	
+	  return typeof thing;
+	}
+	
+	module.exports = exports['default'];
+
+/***/ },
+/* 287 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	exports["default"] = mergeState;
+	
+	function mergeState(initialState, persistedState) {
+	  return persistedState ? _extends({}, initialState, persistedState) : initialState;
+	}
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 288 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -56198,7 +56720,7 @@
 	exports['default'] = thunk;
 
 /***/ },
-/* 278 */
+/* 289 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56209,32 +56731,41 @@
 	
 	var _reactRedux = __webpack_require__(234);
 	
-	var _directory = __webpack_require__(279);
+	var _directory = __webpack_require__(290);
 	
 	var _directory2 = _interopRequireDefault(_directory);
 	
 	var _room_actions = __webpack_require__(273);
 	
-	var _selectors = __webpack_require__(280);
+	var _message_actions = __webpack_require__(280);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var mapStateToProps = function mapStateToProps(state) {
 	  return {
-	    rooms: state.rooms
+	    rooms: state.rooms.roomsList,
+	    user: state.user
 	  };
 	};
 	
 	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	  return {
-	    fetchRooms: dispatch((0, _room_actions.fetchRooms)())
+	    fetchRooms: function fetchRooms() {
+	      return dispatch((0, _room_actions.fetchRooms)());
+	    },
+	    fetchRoom: function fetchRoom(id) {
+	      return dispatch((0, _room_actions.fetchRoom)(id));
+	    },
+	    fetchMessages: function fetchMessages(id) {
+	      return dispatch((0, _message_actions.fetchMessages)(id));
+	    }
 	  };
 	};
 	
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_directory2.default);
 
 /***/ },
-/* 279 */
+/* 290 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56249,11 +56780,11 @@
 	
 	var _lodash = __webpack_require__(276);
 	
-	var _room = __webpack_require__(281);
+	var _room = __webpack_require__(291);
 	
 	var _room2 = _interopRequireDefault(_room);
 	
-	var _user_item = __webpack_require__(282);
+	var _user_item = __webpack_require__(292);
 	
 	var _user_item2 = _interopRequireDefault(_user_item);
 	
@@ -56261,20 +56792,32 @@
 	
 	// Components
 	var Directory = function Directory(_ref) {
-	  var rooms = _ref.rooms;
+	  var rooms = _ref.rooms,
+	      fetchRoom = _ref.fetchRoom,
+	      user = _ref.user,
+	      fetchMessages = _ref.fetchMessages;
 	
+	  var _handleClick = function _handleClick(e) {
+	    var roomId = e.target.id;
+	    if (roomId) {
+	      fetchRoom(roomId).then(fetchMessages(roomId)).then(_scroll());
+	    }
+	  };
 	
-	  var _roomsList = (0, _lodash.isEmpty)(rooms) ? [] : rooms;
+	  var _scroll = function _scroll() {
+	    var log = document.getElementById('log');
+	    log.scrollTop = log.scrollHeight;
+	  };
 	
 	  return _react2.default.createElement(
 	    'div',
 	    { id: 'directory' },
-	    _react2.default.createElement(_user_item2.default, null),
+	    _react2.default.createElement(_user_item2.default, { user: user }),
 	    _react2.default.createElement(
 	      'div',
-	      { className: 'room-list' },
-	      _roomsList.map(function (room) {
-	        return _react2.default.createElement(_room2.default, { room: room, key: room.id });
+	      { className: 'room-list', onClick: _handleClick },
+	      rooms.map(function (room) {
+	        return _react2.default.createElement(_room2.default, { room: room, id: room.id, key: room.id });
 	      })
 	    )
 	  );
@@ -56283,23 +56826,7 @@
 	exports.default = Directory;
 
 /***/ },
-/* 280 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var asArray = exports.asArray = function asArray(_ref) {
-	  var rooms = _ref.rooms;
-	  return Object.keys(rooms).map(function (key) {
-	    return rooms[key];
-	  });
-	};
-
-/***/ },
-/* 281 */
+/* 291 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56315,14 +56842,15 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var Room = function Room(_ref) {
-	  var room = _ref.room;
+	  var room = _ref.room,
+	      id = _ref.id;
 	
 	  return _react2.default.createElement(
 	    'div',
-	    { className: 'room' },
+	    { className: 'room', id: id },
 	    _react2.default.createElement(
 	      'div',
-	      { className: 'room-name' },
+	      { className: 'room-name', id: id },
 	      room.name
 	    )
 	  );
@@ -56331,7 +56859,388 @@
 	exports.default = Room;
 
 /***/ },
-/* 282 */
+/* 292 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var UserItem = function (_React$Component) {
+	  _inherits(UserItem, _React$Component);
+	
+	  function UserItem(props) {
+	    _classCallCheck(this, UserItem);
+	
+	    var _this = _possibleConstructorReturn(this, (UserItem.__proto__ || Object.getPrototypeOf(UserItem)).call(this, props));
+	
+	    _this.state = {
+	      minutes: 'less than 1',
+	      tickId: null
+	    };
+	    _this._tick = _this._tick.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(UserItem, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var tickId = setInterval(this._tick, 60000);
+	      this.setState({ tickId: tickId });
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      clearInterval(this.state.tickId);
+	    }
+	  }, {
+	    key: '_tick',
+	    value: function _tick() {
+	      if (this.state.minutes === 'less than 1') {
+	        this.setState({
+	          minutes: 1
+	        });
+	      } else {
+	        this.setState({
+	          minutes: this.state.minutes + 1
+	        });
+	      }
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'user-container' },
+	        _react2.default.createElement(
+	          'div',
+	          { id: 'user-name' },
+	          this.props.user
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { id: 'user-duration' },
+	          _react2.default.createElement('i', { className: 'fa fa-circle' }),
+	          'Online for ',
+	          this.state.minutes,
+	          ' minute(s)'
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return UserItem;
+	}(_react2.default.Component);
+	
+	exports.default = UserItem;
+
+/***/ },
+/* 293 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _reactRedux = __webpack_require__(234);
+	
+	var _login = __webpack_require__(294);
+	
+	var _login2 = _interopRequireDefault(_login);
+	
+	var _user_actions = __webpack_require__(278);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var mapStateToProps = function mapStateToProps(state) {
+	  return {
+	    currentUser: state.user
+	  };
+	};
+	
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	  return {
+	    loginUser: function loginUser(user) {
+	      return dispatch((0, _user_actions.receiveCurrentUser)(user));
+	    }
+	  };
+	};
+	
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_login2.default);
+
+/***/ },
+/* 294 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(179);
+	
+	var _lodash = __webpack_require__(276);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Login = function (_React$Component) {
+	  _inherits(Login, _React$Component);
+	
+	  function Login(props) {
+	    _classCallCheck(this, Login);
+	
+	    var _this = _possibleConstructorReturn(this, (Login.__proto__ || Object.getPrototypeOf(Login)).call(this, props));
+	
+	    _this.state = {
+	      user: ""
+	    };
+	    (0, _lodash.bindAll)(_this, '_handleChange', '_handleSubmit');
+	    return _this;
+	  }
+	
+	  _createClass(Login, [{
+	    key: '_handleSubmit',
+	    value: function _handleSubmit() {
+	      this.props.loginUser((0, _lodash.capitalize)(this.state.user));
+	      this.props.router.push('/chat');
+	    }
+	  }, {
+	    key: '_handleChange',
+	    value: function _handleChange(event) {
+	      var state = {};
+	      state[event.target.id] = event.target.value;
+	      this.setState(state);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'login-page' },
+	        _react2.default.createElement('input', { className: 'login-textbox', type: 'text', id: 'user', onChange: this._handleChange, placeholder: 'Type in your username...' }),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'login-button', onClick: this._handleSubmit },
+	          'Launch'
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return Login;
+	}(_react2.default.Component);
+	
+	module.exports = (0, _reactRouter.withRouter)(Login);
+
+/***/ },
+/* 295 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _reactRedux = __webpack_require__(234);
+	
+	var _chat = __webpack_require__(296);
+	
+	var _chat2 = _interopRequireDefault(_chat);
+	
+	var _message_actions = __webpack_require__(280);
+	
+	var _room_actions = __webpack_require__(273);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var mapStateToProps = function mapStateToProps(state) {
+	  return {
+	    currentRoom: state.rooms.currentRoom,
+	    messages: state.messages,
+	    user: state.user
+	  };
+	};
+	
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	  return {
+	    fetchMessages: function fetchMessages(id) {
+	      return dispatch((0, _message_actions.fetchMessages)(id));
+	    },
+	    addMessage: function addMessage(id, message, name) {
+	      return dispatch((0, _message_actions.addMessage)(id, message, name));
+	    },
+	    fetchRoom: function fetchRoom(id) {
+	      return dispatch((0, _room_actions.fetchRoom)(id));
+	    }
+	  };
+	};
+	
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_chat2.default);
+
+/***/ },
+/* 296 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _directory_container = __webpack_require__(289);
+	
+	var _directory_container2 = _interopRequireDefault(_directory_container);
+	
+	var _messages = __webpack_require__(297);
+	
+	var _messages2 = _interopRequireDefault(_messages);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Chat = function Chat(_ref) {
+	  var currentRoom = _ref.currentRoom,
+	      messages = _ref.messages,
+	      addMessage = _ref.addMessage,
+	      user = _ref.user,
+	      fetchRoom = _ref.fetchRoom;
+	
+	  return _react2.default.createElement(
+	    'div',
+	    { className: 'chat-container' },
+	    _react2.default.createElement(_directory_container2.default, null),
+	    _react2.default.createElement(_messages2.default, { user: user,
+	      room: currentRoom,
+	      messages: messages,
+	      addMessage: addMessage,
+	      fetchRoom: fetchRoom
+	    })
+	  );
+	};
+	
+	exports.default = Chat;
+
+/***/ },
+/* 297 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _log = __webpack_require__(298);
+	
+	var _log2 = _interopRequireDefault(_log);
+	
+	var _room_info = __webpack_require__(299);
+	
+	var _room_info2 = _interopRequireDefault(_room_info);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Messages = function (_React$Component) {
+	  _inherits(Messages, _React$Component);
+	
+	  function Messages(props) {
+	    _classCallCheck(this, Messages);
+	
+	    var _this = _possibleConstructorReturn(this, (Messages.__proto__ || Object.getPrototypeOf(Messages)).call(this, props));
+	
+	    _this._handleEnter = _this._handleEnter.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(Messages, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this._scroll();
+	    }
+	  }, {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate() {
+	      this._scroll();
+	    }
+	  }, {
+	    key: '_handleEnter',
+	    value: function _handleEnter(event) {
+	      var props = this.props;
+	      if (event.key == 'Enter') {
+	        this.props.addMessage(props.room.id, event.target.value, props.user);
+	        event.target.value = "";
+	        this.props.fetchRoom(props.room.id);
+	      }
+	    }
+	  }, {
+	    key: '_scroll',
+	    value: function _scroll() {
+	      var log = document.getElementById('log');
+	      log.scrollTop = log.scrollHeight;
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'message-container' },
+	        _react2.default.createElement(_room_info2.default, { room: this.props.room }),
+	        _react2.default.createElement(_log2.default, { messages: this.props.messages, user: this.props.user }),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'message-field' },
+	          _react2.default.createElement('input', { className: 'message-text', placeholder: 'Type your message here...', onKeyPress: this._handleEnter, type: 'text' })
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return Messages;
+	}(_react2.default.Component);
+	
+	module.exports = Messages;
+
+/***/ },
+/* 298 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -56346,24 +57255,114 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var UserItem = function UserItem() {
+	var Log = function Log(_ref) {
+	  var messages = _ref.messages,
+	      user = _ref.user;
+	
+	
+	  var _renderMessages = function _renderMessages() {
+	    return messages.map(function (m, idx) {
+	      if (m.name === user) {
+	        return _renderActive(m, idx);
+	      } else {
+	        return _renderInactive(m, idx);
+	      }
+	    });
+	  };
+	
+	  var _renderInactive = function _renderInactive(m, idx) {
+	    return _react2.default.createElement(
+	      'div',
+	      { key: idx, className: 'message-item' },
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'author-message-container' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'message' },
+	          m.message
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'message-author' },
+	          m.name
+	        )
+	      )
+	    );
+	  };
+	
+	  var _renderActive = function _renderActive(m, idx) {
+	    return _react2.default.createElement(
+	      'div',
+	      { key: idx, className: 'message-item active' },
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'author-message-container' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'active-message message' },
+	          m.message
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'active-author message-author' },
+	          m.name
+	        )
+	      )
+	    );
+	  };
+	
 	  return _react2.default.createElement(
 	    'div',
-	    { className: 'user-container' },
+	    { className: 'message-log', id: 'log' },
+	    _renderMessages()
+	  );
+	};
+	
+	exports.default = Log;
+
+/***/ },
+/* 299 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var RoomInfo = function RoomInfo(_ref) {
+	  var room = _ref.room;
+	
+	  return _react2.default.createElement(
+	    'div',
+	    { className: 'room-info-container' },
 	    _react2.default.createElement(
 	      'div',
-	      { id: 'user-name' },
-	      'Billy Bob Joe'
+	      { className: 'room-info-name' },
+	      room.name
 	    ),
 	    _react2.default.createElement(
 	      'div',
-	      { id: 'user-duration' },
-	      'Online for 12 minutes'
+	      { className: 'user-list' },
+	      room.users.map(function (user, idx) {
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'user-list-name', key: idx },
+	          user
+	        );
+	      })
 	    )
 	  );
 	};
 	
-	exports.default = UserItem;
+	exports.default = RoomInfo;
 
 /***/ }
 /******/ ]);

@@ -1,15 +1,18 @@
 import { connect } from 'react-redux';
 import Directory from './directory';
-import { fetchRooms } from '../../actions/room_actions';
-import { asArray } from '../../reducers/selectors';
+import { fetchRooms, fetchRoom } from '../../actions/room_actions';
+import { fetchMessages } from '../../actions/message_actions';
 
 const mapStateToProps = state => ({
-  rooms: state.rooms
+  rooms: state.rooms.roomsList,
+  user: state.user
 });
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchRooms: dispatch(fetchRooms())
+    fetchRooms: () => dispatch(fetchRooms()),
+    fetchRoom: (id) => dispatch(fetchRoom(id)),
+    fetchMessages: (id) => dispatch(fetchMessages(id))
   };
 };
 

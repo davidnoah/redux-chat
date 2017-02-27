@@ -1,10 +1,13 @@
 import { createStore, applyMiddleware } from 'redux';
 import rootReducer from './reducers/root_reducer';
-import thunk from 'redux-thunk';
+import enhancers from './middleware/enhancers';
 
-const store = createStore(
-  rootReducer,
-  applyMiddleware(thunk)
+const configureStore = (preloadedState = {}) => (
+  createStore(
+    rootReducer,
+    preloadedState,
+    enhancers
+  )
 );
 
-export default store;
+export default configureStore;
