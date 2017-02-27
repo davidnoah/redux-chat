@@ -57079,52 +57079,7 @@
 	module.exports = (0, _reactRouter.withRouter)(Login);
 
 /***/ },
-/* 296 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _reactRedux = __webpack_require__(234);
-	
-	var _messages = __webpack_require__(298);
-	
-	var _messages2 = _interopRequireDefault(_messages);
-	
-	var _message_actions = __webpack_require__(280);
-	
-	var _room_actions = __webpack_require__(273);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var mapStateToProps = function mapStateToProps(state) {
-	  return {
-	    room: state.currentRoom,
-	    messages: state.messages,
-	    user: state.user
-	  };
-	};
-	
-	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-	  return {
-	    fetchMessages: function fetchMessages(id) {
-	      return dispatch((0, _message_actions.fetchMessages)(id));
-	    },
-	    addMessage: function addMessage(id, message, name) {
-	      return dispatch((0, _message_actions.addMessage)(id, message, name));
-	    },
-	    fetchRoom: function fetchRoom(id) {
-	      return dispatch((0, _room_actions.fetchRoom)(id));
-	    }
-	  };
-	};
-	
-	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_messages2.default);
-
-/***/ },
+/* 296 */,
 /* 297 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -57142,9 +57097,9 @@
 	
 	var _directory_container2 = _interopRequireDefault(_directory_container);
 	
-	var _chat_container = __webpack_require__(296);
+	var _messages_container = __webpack_require__(301);
 	
-	var _chat_container2 = _interopRequireDefault(_chat_container);
+	var _messages_container2 = _interopRequireDefault(_messages_container);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -57153,7 +57108,7 @@
 	    'div',
 	    { className: 'chat-container' },
 	    _react2.default.createElement(_directory_container2.default, null),
-	    _react2.default.createElement(_chat_container2.default, null)
+	    _react2.default.createElement(_messages_container2.default, null)
 	  );
 	};
 	
@@ -57371,6 +57326,52 @@
 	};
 	
 	exports.default = RoomInfo;
+
+/***/ },
+/* 301 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _reactRedux = __webpack_require__(234);
+	
+	var _messages = __webpack_require__(298);
+	
+	var _messages2 = _interopRequireDefault(_messages);
+	
+	var _message_actions = __webpack_require__(280);
+	
+	var _room_actions = __webpack_require__(273);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var mapStateToProps = function mapStateToProps(state) {
+	  return {
+	    room: state.currentRoom,
+	    messages: state.messages,
+	    user: state.user
+	  };
+	};
+	
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+	  return {
+	    fetchMessages: function fetchMessages(id) {
+	      return dispatch((0, _message_actions.fetchMessages)(id));
+	    },
+	    addMessage: function addMessage(id, message, name) {
+	      return dispatch((0, _message_actions.addMessage)(id, message, name));
+	    },
+	    fetchRoom: function fetchRoom(id) {
+	      return dispatch((0, _room_actions.fetchRoom)(id));
+	    }
+	  };
+	};
+	
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_messages2.default);
 
 /***/ }
 /******/ ]);
