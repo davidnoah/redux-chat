@@ -15,6 +15,7 @@ import { fetchMessages } from '../actions/message_actions';
 const Root = ({ store }) => {
 
   const ensureLogin = (nextState, replace, cb) => {
+    debugger;
     if (!store.getState().user) {
       replace('/');
     } else {
