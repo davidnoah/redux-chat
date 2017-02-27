@@ -3,11 +3,11 @@
 ---
 ### Setup
 
-0. `git clone`
-0. Navigate to directory
-0. `npm install`
-0. In two separate Terminal tabs respectively, `npm run api-server`, and `webpack -w`
-0. Navigate to localhost:8080
+1. `git clone`
+2. Navigate to directory
+3. `npm install`
+4. In two separate Terminal tabs respectively, `npm run api-server`, and `webpack -w`
+5. Navigate to localhost:8080
 
 * Server can be stopped using `ctl+c`
 
@@ -46,7 +46,7 @@ Arguably the most important design implementation was the state shape:
     users: ['Ryan', 'Nick']
   },
   messages: [
-    {name: 'Ryan', message: 'ayyyyy'}, 
+    {name: 'Ryan', message: 'ayyyyy'},
     {name: 'Nick', message: 'lmao'}
   ]
 }
