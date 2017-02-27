@@ -15,17 +15,17 @@
 
 ### Features
 
-1. Chat Interface
+#### Chat Interface
 
 ![search](docs/chat_interface.png)
 
-2. Chatroom Directory
+#### Chatroom Directory
 
 ![search](docs/directory.png)
 
-3. Login Page
+#### Login Page
 
-![search](docs/)
+![search](docs/login.png)
 
 ---
 ### Design
