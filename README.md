@@ -17,15 +17,15 @@
 
 #### Chat Interface
 
-<img src="docs/chat_interface.png" style="width: 350px;"/>
+<img src="docs/chat_interface.png" width="350" />
 
 #### Chatroom Directory
 
-<img src="docs/directory.png" style="width: 190px;"/>
+<img src="docs/directory.png" width="190"/>
 
 #### Login Page
 
-<img src="docs/login.png" style="width: 350px;"/>
+<img src="docs/login.png" width="350" />
 
 ---
 ### Design
