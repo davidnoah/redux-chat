@@ -3,11 +3,11 @@
 ---
 ### Setup
 
-1. `git clone`
-2. Navigate to directory
-3. `npm install`
-4. In two separate Terminal tabs respectively, `npm run api-server`, and `webpack -w`
-5. Navigate to localhost:8080
+- `git clone`
+- Navigate to directory
+- `npm install`
+- In two separate Terminal tabs respectively, `npm run api-server`, and `webpack -w`
+- Navigate to http://localhost:8080/
 
 * Server can be stopped using `ctl+c`
 
