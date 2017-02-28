@@ -67,6 +67,7 @@
 	document.addEventListener("DOMContentLoaded", function () {
 	  var rootDiv = document.getElementById("root");
 	
+	  // Checks if localStorage contains a user and adds this to state
 	  var store = void 0;
 	  var user = window.localStorage.getItem('_chatAppCurrentUser');
 	  if (user) {
@@ -75,7 +76,7 @@
 	  } else {
 	    store = (0, _store2.default)();
 	  }
-	  window.store = store;
+	
 	  _reactDom2.default.render(_react2.default.createElement(_root2.default, { store: store }), rootDiv);
 	});
 

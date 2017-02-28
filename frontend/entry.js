@@ -6,6 +6,7 @@ import configureStore from './store';
 document.addEventListener("DOMContentLoaded", () => {
   const rootDiv = document.getElementById("root");
 
+  // Checks if localStorage contains a user and adds this to state
   let store;
   let user = window.localStorage.getItem('_chatAppCurrentUser');
   if (user) {
@@ -14,6 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     store = configureStore();
   }
-  window.store = store;
+  
   ReactDOM.render(<Root store={store}/>, rootDiv);
 });
