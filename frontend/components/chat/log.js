@@ -2,6 +2,7 @@ import React from 'react';
 
 const Log = ({ messages, user }) => {
 
+// loop to render all messages
   const _renderMessages = () => {
     return (messages.map((m, idx) => {
       if (m.name === user) {
@@ -12,6 +13,7 @@ const Log = ({ messages, user }) => {
     }))
   }
 
+// render other users messages
   const _renderInactive = (m, idx) => (
     <div key={idx} className='message-item'>
               <div className='author-message-container'>
@@ -21,6 +23,7 @@ const Log = ({ messages, user }) => {
             </div>
   )
 
+// render current users messages
   const _renderActive = (m, idx) => (
     <div key={idx} className={'message-item active'}>
               <div className='author-message-container'>

@@ -21557,6 +21557,7 @@
 	  var store = _ref.store;
 	
 	
+	  // If user is not logged in, redirect to login page, otherwise fetch needed data
 	  var ensureLogin = function ensureLogin(nextState, replace, cb) {
 	    if (!store.getState().user) {
 	      replace('/');
@@ -21567,6 +21568,7 @@
 	    }
 	  };
 	
+	  // Router defining two routes, '/' and '/chat'
 	  return _react2.default.createElement(
 	    _reactRedux.Provider,
 	    { store: store },
@@ -56292,6 +56294,7 @@
 	var LOGIN_USER = exports.LOGIN_USER = 'LOGIN_USER';
 	var RECEIVE_CURRENT_USER = exports.RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
 	
+	// sync actions
 	var receiveCurrentUser = exports.receiveCurrentUser = function receiveCurrentUser(user) {
 	  return {
 	    type: RECEIVE_CURRENT_USER,
@@ -56472,6 +56475,8 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	// applies middleware thunk, allows actions to return functions
+	// saves the current user to localStorage in the browser
 	var enhancers = (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), (0, _reduxLocalstorage2.default)('user', { key: '_chatAppCurrentUser' }));
 	
 	exports.default = enhancers;
@@ -56816,6 +56821,8 @@
 	      user = _ref.user,
 	      fetchMessages = _ref.fetchMessages;
 	
+	
+	  // changes the current room and acquires it's data
 	  var _handleClick = function _handleClick(e) {
 	    var roomId = e.target.id;
 	    if (roomId) {
@@ -56823,6 +56830,7 @@
 	    }
 	  };
 	
+	  // Ensures the message log scrolls when a new chat room is entered
 	  var _scroll = function _scroll() {
 	    var log = document.getElementById('log');
 	    log.scrollTop = log.scrollHeight;
@@ -56860,6 +56868,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	// steless Component to display a room name
 	var Room = function Room(_ref) {
 	  var room = _ref.room,
 	      id = _ref.id;
@@ -56917,17 +56926,26 @@
 	    return _this;
 	  }
 	
+	  // initializes clock to track user duration
+	
+	
 	  _createClass(UserItem, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      var tickId = setInterval(this._tick, 60000);
 	      this.setState({ tickId: tickId });
 	    }
+	
+	    // ensures setInterval does not continue counting
+	
 	  }, {
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {
 	      clearInterval(this.state.tickId);
 	    }
+	
+	    // adds one minute to a user's online duration
+	
 	  }, {
 	    key: '_tick',
 	    value: function _tick() {
@@ -57044,6 +57062,9 @@
 	    return _this;
 	  }
 	
+	  // allows login on key enter
+	
+	
 	  _createClass(Login, [{
 	    key: '_handleKeyPress',
 	    value: function _handleKeyPress(event) {
@@ -57051,12 +57072,18 @@
 	        this._login();
 	      }
 	    }
+	
+	    // dispatches the login action and redirects to chat interface
+	
 	  }, {
 	    key: '_login',
 	    value: function _login() {
 	      this.props.loginUser((0, _lodash.capitalize)(this.state.user));
 	      this.props.router.push('/chat');
 	    }
+	
+	    // save input field string in component state
+	
 	  }, {
 	    key: '_handleChange',
 	    value: function _handleChange(event) {
@@ -57110,6 +57137,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	// simple container that houses the entire chat interface
 	var Chat = function Chat() {
 	  return _react2.default.createElement(
 	    'div',
@@ -57149,6 +57177,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	// Messages entry point that displays message log and input field
 	var Messages = function (_React$Component) {
 	  _inherits(Messages, _React$Component);
 	
@@ -57161,16 +57190,25 @@
 	    return _this;
 	  }
 	
+	  // scrolls on initial mount
+	
+	
 	  _createClass(Messages, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      this._scroll();
 	    }
+	
+	    // scrolls when new data is received
+	
 	  }, {
 	    key: 'componentDidUpdate',
 	    value: function componentDidUpdate() {
 	      this._scroll();
 	    }
+	
+	    // updates user list and adds a new message
+	
 	  }, {
 	    key: '_handleEnter',
 	    value: function _handleEnter(event) {
@@ -57181,6 +57219,9 @@
 	        this.props.fetchRoom(props.room.id);
 	      }
 	    }
+	
+	    // function to scroll th emessage log
+	
 	  }, {
 	    key: '_scroll',
 	    value: function _scroll() {
@@ -57230,6 +57271,7 @@
 	      user = _ref.user;
 	
 	
+	  // loop to render all messages
 	  var _renderMessages = function _renderMessages() {
 	    return messages.map(function (m, idx) {
 	      if (m.name === user) {
@@ -57240,6 +57282,7 @@
 	    });
 	  };
 	
+	  // render other users messages
 	  var _renderInactive = function _renderInactive(m, idx) {
 	    return _react2.default.createElement(
 	      'div',
@@ -57261,6 +57304,7 @@
 	    );
 	  };
 	
+	  // render current users messages
 	  var _renderActive = function _renderActive(m, idx) {
 	    return _react2.default.createElement(
 	      'div',
@@ -57307,6 +57351,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	// Component that displays the current room name and user list
 	var RoomInfo = function RoomInfo(_ref) {
 	  var room = _ref.room;
 	

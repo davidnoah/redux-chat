@@ -2,20 +2,24 @@ import React from 'react';
 import Log from './log';
 import RoomInfo from './room_info';
 
+// Messages entry point that displays message log and input field
 class Messages extends React.Component {
   constructor(props) {
     super(props);
     this._handleEnter = this._handleEnter.bind(this);
   }
 
+// scrolls on initial mount
   componentDidMount() {
     this._scroll();
   }
 
+// scrolls when new data is received
   componentDidUpdate() {
     this._scroll();
   }
 
+// updates user list and adds a new message
   _handleEnter(event) {
     let props = this.props;
     if (event.key == 'Enter') {
@@ -25,6 +29,7 @@ class Messages extends React.Component {
     }
   }
 
+// function to scroll th emessage log
   _scroll() {
     let log = document.getElementById('log');
     log.scrollTop = log.scrollHeight;

@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Component that displays the current room name and user list
 const RoomInfo = ({ room }) => {
   return (
     <div className='room-info-container'>

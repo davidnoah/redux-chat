@@ -11,17 +11,20 @@ class Login extends React.Component {
     bindAll(this, '_handleChange', '_login', '_handleKeyPress');
   }
 
+// allows login on key enter
   _handleKeyPress(event) {
     if (event.key === "Enter") {
       this._login();
     }
   }
 
+// dispatches the login action and redirects to chat interface
   _login() {
     this.props.loginUser(capitalize(this.state.user));
     this.props.router.push('/chat');
   }
 
+// save input field string in component state
   _handleChange(event) {
     let state = {};
     state[event.target.id] = event.target.value;

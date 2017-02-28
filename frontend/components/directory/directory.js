@@ -6,6 +6,8 @@ import Room from './room';
 import UserItem from './user_item.js';
 
 const Directory = ({ rooms, fetchRoom, user, fetchMessages }) => {
+
+// changes the current room and acquires it's data
   const _handleClick = (e) => {
     let roomId = e.target.id;
     if (roomId) {
@@ -16,6 +18,7 @@ const Directory = ({ rooms, fetchRoom, user, fetchMessages }) => {
 
   }
 
+// Ensures the message log scrolls when a new chat room is entered
   const _scroll = () => {
     let log = document.getElementById('log');
     log.scrollTop = log.scrollHeight;

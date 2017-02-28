@@ -13,6 +13,7 @@ import { fetchMessages } from '../actions/message_actions';
 
 const Root = ({ store }) => {
 
+// If user is not logged in, redirect to login page, otherwise fetch needed data
   const ensureLogin = (nextState, replace, cb) => {
     if (!store.getState().user) {
       replace('/');
@@ -24,6 +25,7 @@ const Root = ({ store }) => {
     }
   };
 
+// Router defining two routes, '/' and '/chat'
   return (
     <Provider store={store}>
       <Router history={browserHistory} >
