@@ -85,11 +85,11 @@ Root
 
 ### Overall Approach
 
-My approach when building this app was to log in a user and save the user's name within localStorage. Then, fetch all needed data from my application API before rendering the chat interface. I then built a listener such that every time my application state changes, the appropriate component re-renders. The chat interface provides a UI that allows the user to navigate between chatrooms and post messages within those chatrooms. If a user tries to navigate to the '/chat' route without logging in, they will be redirected back to the index route login page.
+My initial application flow is to log in a user and save the user's name within localStorage. Then, fetch all needed data from my application API before rendering the chat interface. I then built a listener such that every time my application state changes, the appropriate component re-renders. The chat interface provides a UI that allows the user to navigate between chatrooms and post messages within those chatrooms. If a user tries to navigate to the '/chat' route without logging in, they will be redirected back to the index route login page.
 
 Because I saved the current user's info in the browser's localStorage API, the user can leave the chat interface and upon navigation back to the application's /chat route, the user will still be logged in.
 
-In order to improve readability and testability, I opted to use small, stateless components as must as possible. The components are pure. Passing the same data in, will result in the same data out and because of their small size, these components are easily reusable.
+In order to improve readability and testability, I opted to use small, stateless components as much as possible. The components are pure. Passing the same data in, will result in the same data out and because of their small size, these components are easily reusable.
 
 ### Future Improvements
 
